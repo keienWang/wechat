@@ -1,12 +1,10 @@
 package wx
 
 import (
-	"github.com/leeeboo/wechat/config"
+	"github.com/keienWang/wechat/config"
 	"log"
 	"net/http"
 )
-
-
 
 func Get(w http.ResponseWriter, r *http.Request) {
 
@@ -40,5 +38,3 @@ func Post(w http.ResponseWriter, r *http.Request) {
 	client.Run()
 	return
 }
-
-

@@ -2,14 +2,12 @@ package main
 
 import (
 	"fmt"
-	"github.com/leeeboo/wechat/config"
-	"github.com/leeeboo/wechat/wx"
+	"github.com/keienWang/wechat/config"
+	"github.com/keienWang/wechat/wx"
 	"log"
 	"net/http"
 	"time"
 )
-
-
 
 func main() {
 	server := http.Server{
@@ -23,4 +21,3 @@ func main() {
 	log.Println(fmt.Sprintf("Listen: %d", config.Port))
 	log.Fatal(server.ListenAndServe())
 }
-

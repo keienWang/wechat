@@ -5,7 +5,7 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
-	"github.com/leeeboo/wechat/gongNeng"
+	"github.com/keienWang/wechat/gongNeng"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -14,13 +14,14 @@ import (
 	"github.com/clbanning/mxj"
 )
 
-var  ziliao="Pr教程链接: https://pan.baidu.com/s/1pAyzJZFC1mT3BzTqJ6RPLQ 提取码: h1zw \n " +
+var daohang = "欢迎你关注本公众号，想要教程资料或工具的请回复“资料”\t\t\t\t" + "流行关键词分别为:“舔狗日记”；“渣男语录”；“鸡汤”；“人间凑数”，更多功能正在开发中！"
+
+var ziliao = "Pr教程链接: https://pan.baidu.com/s/1pAyzJZFC1mT3BzTqJ6RPLQ 提取码: h1zw \n " +
 	"Ps资料链接：https://pan.baidu.com/s/1RJ1nz4gv1L-c3RI72oe8XA 提取码: 0oc9 \n" +
 	"无水印工具：https://pan.baidu.com/s/1zx2hUiXH-pI8sLc31uO3Ug 提取码: x29k  \n" +
 	"销售必备心灵鸡汤：https://pan.baidu.com/s/171_NdVbKtHBp-vferjkzLQ 提取码：4yft \n" +
-	" 英语六级资料：https://pan.baidu.com/s/193N5nSCXEhHbzp-ohfANbg 提取码: l4s1  \n"+
+	" 英语六级资料：https://pan.baidu.com/s/193N5nSCXEhHbzp-ohfANbg 提取码: l4s1  \n" +
 	"计算机等级考试系统：链接: https://pan.baidu.com/s/1Xt5FUgKT2AcpvZajI1eQJg 提取码: 9u57"
-
 
 type weixinQuery struct {
 	Signature    string `json:"signature"`
@@ -115,24 +116,22 @@ func (this *WeixinClient) initMessage() error {
 	return nil
 }
 
-
-
 func (this *WeixinClient) text() {
 
 	inMsg, ok := this.Message["Content"].(string)
-	fmt.Println("接收到的消息：",inMsg)
+	fmt.Println("接收到的消息：", inMsg)
 
 	if !ok {
 		return
 	}
 
-var reply TextMessage
+	var reply TextMessage
 
 	switch inMsg {
 	case "舔狗日记":
 
 		dog, err := gongNeng.TianDog()
-		if err!=nil{
+		if err != nil {
 			log.Println(err)
 			this.ResponseWriter.WriteHeader(403)
 			return
@@ -142,7 +141,7 @@ var reply TextMessage
 		reply.Content = value2CDATA(fmt.Sprintf("%s", dog))
 	case "渣男语录":
 		words, err := gongNeng.ZhaManWords()
-		if err!=nil{
+		if err != nil {
 			log.Println(err)
 			this.ResponseWriter.WriteHeader(403)
 			return
@@ -155,7 +154,7 @@ var reply TextMessage
 		reply.Content = value2CDATA(fmt.Sprintf("%s", ziliao))
 	case "鸡汤":
 		tang, err := gongNeng.DuJiTang()
-		if err!=nil{
+		if err != nil {
 			log.Println(err)
 			this.ResponseWriter.WriteHeader(403)
 			return
@@ -163,11 +162,20 @@ var reply TextMessage
 		reply.InitBaseData(this, "text")
 		reply.Content = value2CDATA(fmt.Sprintf("%s", tang))
 
+	case "人间凑数":
+		fmt.Println("1232213123213213")
+		shu, err := gongNeng.RenJianCouShu()
+		if err != nil {
+			log.Println(err)
+			this.ResponseWriter.WriteHeader(403)
+			return
+		}
+		reply.InitBaseData(this, "text")
+		reply.Content = value2CDATA(fmt.Sprintf("%s", shu))
 	default:
 		reply.InitBaseData(this, "text")
 		reply.Content = value2CDATA(fmt.Sprintf("我收到的是：%s", inMsg))
 	}
-
 
 	replyXml, err := xml.Marshal(reply)
 
@@ -181,8 +189,6 @@ var reply TextMessage
 	this.ResponseWriter.Write(replyXml)
 }
 
-
-
 func (this *WeixinClient) event() {
 
 	inMsg, ok := this.Message["Event"].(string)
@@ -192,16 +198,15 @@ func (this *WeixinClient) event() {
 	}
 
 	var reply TextMessage
-	fmt.Println("\ninMsg : "  ,inMsg,"\n")
-
+	fmt.Println("\ninMsg : ", inMsg, "\n")
 
 	//订阅回复
-	if inMsg=="subscribe"{
+	if inMsg == "subscribe" {
 
-		reply.InitBaseData(this,"text")
-		reply.Content= value2CDATA(fmt.Sprintf("%s",ziliao))
+		reply.InitBaseData(this, "text")
+		reply.Content = value2CDATA(fmt.Sprintf("%s", daohang))
 
-	}else {
+	} else {
 		reply.InitBaseData(this, "text")
 		reply.Content = value2CDATA(fmt.Sprintf("%s", "不好意思，主人还未解析本操作！"))
 	}
@@ -217,7 +222,6 @@ func (this *WeixinClient) event() {
 	this.ResponseWriter.Header().Set("Content-Type", "text/xml")
 	this.ResponseWriter.Write(replyXml)
 }
-
 
 func (this *WeixinClient) Run() {
 
@@ -244,7 +248,7 @@ func (this *WeixinClient) Run() {
 	case "event":
 		this.event()
 		break
-		
+
 	default:
 		break
 	}

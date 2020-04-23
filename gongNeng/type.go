@@ -12,7 +12,6 @@ type TianGouRiJi struct {
 	} `json:"author"`
 }
 
-
 type ZhaManWord struct {
 	Code      int      `json:"code"`
 	Message   string   `json:"message"`
@@ -29,4 +28,9 @@ type JiTang struct {
 		Name string `json:"name"`
 		Desc string `json:"desc"`
 	} `json:"author"`
+}
+type RenJian struct {
+	Code int    `json:"code"`
+	Msg  string `json:"msg"`
+	Say  string `json:"say"`
 }

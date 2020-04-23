@@ -2,7 +2,7 @@ package wx
 
 import (
 	"fmt"
-	"github.com/leeeboo/wechat/config"
+	"github.com/keienWang/wechat/config"
 	"log"
 	"net/http"
 	"time"
