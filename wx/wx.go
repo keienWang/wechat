@@ -23,6 +23,7 @@ var (
 
 func init() {
 
+	MapZiLiao["教师资格证"] = "\n链接: https://pan.baidu.com/s/1kQeqDBm_mTIPPhmsvSmCkA \n提取码: yyu2 \n\n"
 	MapZiLiao["Pr教程"] = " \nhttps://pan.baidu.com/s/1pAyzJZFC1mT3BzTqJ6RPLQ \n提取码: h1zw \n\n "
 	MapZiLiao["Ps资料"] = "\nhttps://pan.baidu.com/s/1RJ1nz4gv1L-c3RI72oe8XA \n提取码: 0oc9 \n\n"
 	MapZiLiao["无水印工具"] = "\nhttps://pan.baidu.com/s/1zx2hUiXH-pI8sLc31uO3Ug \n提取码: x29k  \n\n"
@@ -30,7 +31,7 @@ func init() {
 	MapZiLiao["英语六级资料"] = "\nhttps://pan.baidu.com/s/193N5nSCXEhHbzp-ohfANbg \n提取码: l4s1  \n\n"
 	MapZiLiao["计算机等级考试系统"] = "\n链接: https://pan.baidu.com/s/1Xt5FUgKT2AcpvZajI1eQJg \n提取码: 9u57\n\n"
 
-	daohang = "-----欢迎您关注本公众号-----\n\n想要教程资料或工具的请回复:\"资料导航\"\n\n也可以回复相应关键词:\n\n"
+	daohang = "-----欢迎您关注本公众号-----\n\n想要教程资料或工具的请回复:\"导航\"\n\n也可以回复相应关键词:\n\n"
 	for i, _ := range MapZiLiao {
 		daohang = daohang + "\"" + i + "\"\n"
 	}
@@ -170,13 +171,14 @@ func (this *WeixinClient) text() {
 			reply.InitBaseData(this, "text")
 			reply.Content = value2CDATA(fmt.Sprintf("%s", words))
 
-		case "资料导航":
+		case "导航":
 			reply.InitBaseData(this, "text")
 			var ziliao string
 
 			for i, v := range MapZiLiao {
 				ziliao = ziliao + i + ":" + v
 			}
+			ziliao = ziliao + "\n\n" + "\n流行关键词:\n\n" + "\"舔狗日记\"\n\"渣男语录\"\n\"鸡汤\"\n\"人间凑数\"\n\n\n"
 
 			reply.Content = value2CDATA(fmt.Sprintf("%s", ziliao))
 		case "鸡汤":
@@ -200,8 +202,15 @@ func (this *WeixinClient) text() {
 			reply.InitBaseData(this, "text")
 			reply.Content = value2CDATA(fmt.Sprintf("%s", shu))
 		default:
+
+			ren, err := gongNeng.TencentJiQiRen(inMsg)
+			if err != nil {
+				log.Println(err)
+				this.ResponseWriter.WriteHeader(403)
+				return
+			}
 			reply.InitBaseData(this, "text")
-			reply.Content = value2CDATA(fmt.Sprintf("我收到的是：%s", inMsg))
+			reply.Content = value2CDATA(fmt.Sprintf("%s", ren))
 		}
 	}
 

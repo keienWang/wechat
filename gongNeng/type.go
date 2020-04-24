@@ -34,3 +34,11 @@ type RenJian struct {
 	Msg  string `json:"msg"`
 	Say  string `json:"say"`
 }
+
+type tenXun struct {
+	Response struct {
+		Confidence int    `json:"Confidence"`
+		Reply      string `json:"Reply"`
+		RequestID  string `json:"RequestId"`
+	} `json:"Response"`
+}

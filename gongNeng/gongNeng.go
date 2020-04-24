@@ -2,9 +2,21 @@ package gongNeng
 
 import (
 	"encoding/json"
+	"fmt"
+	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
+	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/profile"
+
+	tenerrors "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/errors"
 	"io/ioutil"
 
+	nlp "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/nlp/v20190408"
+
 	"net/http"
+)
+
+var credential = common.NewCredential(
+	"AKIDSGDtJTAKtBev63gESQ84XjfKjmb9nljQ",
+	"73h6JNIAmBUVJrAFb6KvFVVCTTCrITWK",
 )
 
 func TianDog() (res string, err error) {
@@ -94,4 +106,30 @@ func RenJianCouShu() (res string, err error) {
 		return "", err
 	}
 	return data.Say, nil
+}
+
+func TencentJiQiRen(msg string) (res string, err error) {
+
+	cpf := profile.NewClientProfile()
+	cpf.HttpProfile.Endpoint = "nlp.tencentcloudapi.com"
+	client, _ := nlp.NewClient(credential, "ap-guangzhou", cpf)
+
+	request := nlp.NewChatBotRequest()
+
+	params := "{\"Query\":\"" + msg + "\"}"
+	err = request.FromJsonString(params)
+	if err != nil {
+		return "", err
+	}
+	response, err := client.ChatBot(request)
+	if _, ok := err.(*tenerrors.TencentCloudSDKError); ok {
+		fmt.Printf("An API error has returned: %s", err)
+		return "", err
+	}
+	if err != nil {
+		return "", err
+	}
+
+	return *response.Response.Reply, nil
+
 }
