@@ -14,14 +14,30 @@ import (
 	"github.com/clbanning/mxj"
 )
 
-var daohang = "欢迎你关注本公众号，想要教程资料或工具的请回复“资料”\t\t\t\t" + "流行关键词分别为:“舔狗日记”；“渣男语录”；“鸡汤”；“人间凑数”，更多功能正在开发中！"
+var (
+	daohang string
 
-var ziliao = "Pr教程链接: https://pan.baidu.com/s/1pAyzJZFC1mT3BzTqJ6RPLQ 提取码: h1zw \n " +
-	"Ps资料链接：https://pan.baidu.com/s/1RJ1nz4gv1L-c3RI72oe8XA 提取码: 0oc9 \n" +
-	"无水印工具：https://pan.baidu.com/s/1zx2hUiXH-pI8sLc31uO3Ug 提取码: x29k  \n" +
-	"销售必备心灵鸡汤：https://pan.baidu.com/s/171_NdVbKtHBp-vferjkzLQ 提取码：4yft \n" +
-	" 英语六级资料：https://pan.baidu.com/s/193N5nSCXEhHbzp-ohfANbg 提取码: l4s1  \n" +
-	"计算机等级考试系统：链接: https://pan.baidu.com/s/1Xt5FUgKT2AcpvZajI1eQJg 提取码: 9u57"
+	MapZiLiao  = make(map[string]string, 0)
+	GuanJianCi = make(map[string]string, 0)
+)
+
+func init() {
+
+	MapZiLiao["Pr教程"] = " \nhttps://pan.baidu.com/s/1pAyzJZFC1mT3BzTqJ6RPLQ \n提取码: h1zw \n\n "
+	MapZiLiao["Ps资料"] = "\nhttps://pan.baidu.com/s/1RJ1nz4gv1L-c3RI72oe8XA \n提取码: 0oc9 \n\n"
+	MapZiLiao["无水印工具"] = "\nhttps://pan.baidu.com/s/1zx2hUiXH-pI8sLc31uO3Ug \n提取码: x29k  \n\n"
+	MapZiLiao["销售人员鸡汤"] = "\nhttps://pan.baidu.com/s/171_NdVbKtHBp-vferjkzLQ \n提取码：4yft \n\n"
+	MapZiLiao["英语六级资料"] = "\nhttps://pan.baidu.com/s/193N5nSCXEhHbzp-ohfANbg \n提取码: l4s1  \n\n"
+	MapZiLiao["计算机等级考试系统"] = "\n链接: https://pan.baidu.com/s/1Xt5FUgKT2AcpvZajI1eQJg \n提取码: 9u57\n\n"
+
+	daohang = "-----欢迎您关注本公众号-----\n\n想要教程资料或工具的请回复:\"资料导航\"\n\n也可以回复相应关键词:\n\n"
+	for i, _ := range MapZiLiao {
+		daohang = daohang + "\"" + i + "\"\n"
+	}
+
+	daohang = daohang + "\n流行关键词:\n\n" + "\"舔狗日记\"\n\"渣男语录\"\n\"鸡汤\"\n\"人间凑数\"\n\n\n更多功能正在开发中！"
+
+}
 
 type weixinQuery struct {
 	Signature    string `json:"signature"`
@@ -127,54 +143,66 @@ func (this *WeixinClient) text() {
 
 	var reply TextMessage
 
-	switch inMsg {
-	case "舔狗日记":
+	if res, ok := MapZiLiao[inMsg]; ok {
+		reply.InitBaseData(this, "text")
+		reply.Content = value2CDATA(fmt.Sprintf("%s", inMsg+": "+res))
 
-		dog, err := gongNeng.TianDog()
-		if err != nil {
-			log.Println(err)
-			this.ResponseWriter.WriteHeader(403)
-			return
-		}
+	} else {
+		switch inMsg {
+		case "舔狗日记":
 
-		reply.InitBaseData(this, "text")
-		reply.Content = value2CDATA(fmt.Sprintf("%s", dog))
-	case "渣男语录":
-		words, err := gongNeng.ZhaManWords()
-		if err != nil {
-			log.Println(err)
-			this.ResponseWriter.WriteHeader(403)
-			return
-		}
-		reply.InitBaseData(this, "text")
-		reply.Content = value2CDATA(fmt.Sprintf("%s", words))
+			dog, err := gongNeng.TianDog()
+			if err != nil {
+				log.Println(err)
+				this.ResponseWriter.WriteHeader(403)
+				return
+			}
 
-	case "资料":
-		reply.InitBaseData(this, "text")
-		reply.Content = value2CDATA(fmt.Sprintf("%s", ziliao))
-	case "鸡汤":
-		tang, err := gongNeng.DuJiTang()
-		if err != nil {
-			log.Println(err)
-			this.ResponseWriter.WriteHeader(403)
-			return
-		}
-		reply.InitBaseData(this, "text")
-		reply.Content = value2CDATA(fmt.Sprintf("%s", tang))
+			reply.InitBaseData(this, "text")
+			reply.Content = value2CDATA(fmt.Sprintf("%s", dog))
+		case "渣男语录":
+			words, err := gongNeng.ZhaManWords()
+			if err != nil {
+				log.Println(err)
+				this.ResponseWriter.WriteHeader(403)
+				return
+			}
+			reply.InitBaseData(this, "text")
+			reply.Content = value2CDATA(fmt.Sprintf("%s", words))
 
-	case "人间凑数":
-		fmt.Println("1232213123213213")
-		shu, err := gongNeng.RenJianCouShu()
-		if err != nil {
-			log.Println(err)
-			this.ResponseWriter.WriteHeader(403)
-			return
+		case "资料导航":
+			reply.InitBaseData(this, "text")
+			var ziliao string
+
+			for i, v := range MapZiLiao {
+				ziliao = ziliao + i + ":" + v
+			}
+
+			reply.Content = value2CDATA(fmt.Sprintf("%s", ziliao))
+		case "鸡汤":
+			tang, err := gongNeng.DuJiTang()
+			if err != nil {
+				log.Println(err)
+				this.ResponseWriter.WriteHeader(403)
+				return
+			}
+			reply.InitBaseData(this, "text")
+			reply.Content = value2CDATA(fmt.Sprintf("%s", tang))
+
+		case "人间凑数":
+
+			shu, err := gongNeng.RenJianCouShu()
+			if err != nil {
+				log.Println(err)
+				this.ResponseWriter.WriteHeader(403)
+				return
+			}
+			reply.InitBaseData(this, "text")
+			reply.Content = value2CDATA(fmt.Sprintf("%s", shu))
+		default:
+			reply.InitBaseData(this, "text")
+			reply.Content = value2CDATA(fmt.Sprintf("我收到的是：%s", inMsg))
 		}
-		reply.InitBaseData(this, "text")
-		reply.Content = value2CDATA(fmt.Sprintf("%s", shu))
-	default:
-		reply.InitBaseData(this, "text")
-		reply.Content = value2CDATA(fmt.Sprintf("我收到的是：%s", inMsg))
 	}
 
 	replyXml, err := xml.Marshal(reply)
